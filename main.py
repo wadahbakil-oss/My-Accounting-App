@@ -24,7 +24,9 @@ def main(page: ft.Page):
     progress_ring = ft.ProgressRing(visible=False)
 
     def on_file_picked(e: ft.FilePickerResultEvent):
-        if not e.files:
+        if not e.files or e.files[0].path is None:
+            status_text.value = "❌ لم يتم اختيار أي ملف أو أن الصلاحية مرفوضة."
+            page.update()
             return
         
         picked_file = e.files[0]
@@ -53,18 +55,24 @@ def main(page: ft.Page):
                 if df_final.shape[1] == 5:
                     df_final.columns = ["رقم العميل", "اسم العميل", "مدين", "دائن", "الرصيد"]
                 
-                output_file = '/storage/emulated/0/Download/كشف_مصحح_نهائي.xlsx' if os.path.exists('/storage/emulated/0/Download') else 'كشف_مصحح_نهائي.xlsx'
+                # مسار الحفظ في مجلد التنزيلات العام لجهاز الأندرويد
+                output_dir = '/storage/emulated/0/Download'
+                output_file = os.path.join(output_dir, 'كشف_مصحح_نهائي.xlsx')
+                
+                # إذا لم تتوفر الصلاحية للمجلد العام، يحفظ في مجلد التطبيق الخاص
+                if not os.path.exists(output_dir):
+                    output_file = 'كشف_مصحح_نهائي.xlsx'
                 
                 with pd.ExcelWriter(output_file, engine='openpyxl') as writer:
                     df_final.to_excel(writer, index=False, sheet_name='الأرصدة')
                     writer.book.sheets[0].views.sheetView[0].rightToLeft = True
                 
-                status_text.value = f"🎉 تم التحويل بنجاح!\nالملف متوفر في مجلد التحميلات (Download)."
+                status_text.value = f"🎉 تم التحويل بنجاح!\nالملف متوفر باسم 'كشف_مصحح_نهائي.xlsx'."
             else:
                 status_text.value = "❌ لم نجد جداول متوافقة داخل ملف الـ PDF."
                 
         except Exception as ex:
-            status_text.value = f"خطأ أثناء المعالجة: {str(ex)}"
+            status_text.value = f"خطأ أثناء المعالجة: {str(ex)}\nتأكد من إعطاء التطبيق صلاحية الملفات."
             
         progress_ring.visible = False
         page.update()
@@ -72,6 +80,7 @@ def main(page: ft.Page):
     file_picker = ft.FilePicker(on_result=on_file_picked)
     page.overlay.append(file_picker)
 
+    # بناء عناصر الواجهة مباشرة لتفادي مشكلة الشاشة البيضاء
     page.add(
         ft.Icon(name=ft.icons.PICTURE_IN_PICTURE_ALT_ROUNDED, size=80, color=ft.colors.GREEN_700),
         ft.Text(value="نظام أتمتة كشوفات PDF المحاسبية", size=20, weight=ft.FontWeight.BOLD),
@@ -82,7 +91,7 @@ def main(page: ft.Page):
         ft.ElevatedButton(
             "📁 اختر ملف كشف الحساب (PDF)",
             icon=ft.icons.PICTURE_AS_PDF,
-            on_click=lambda _: file_picker.pick_files(allow_multiple=False, file_type=ft.FileType.ANY),
+            on_click=lambda _: file_picker.pick_files(allow_multiple=False),
             style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=10))
         )
     )
