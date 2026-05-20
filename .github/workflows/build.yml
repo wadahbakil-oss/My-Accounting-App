@@ -17,7 +17,7 @@ jobs:
 
     - name: Install Dependencies
       run: |
-        pip install flet pandas openpyxl easyocr pdfplumber arabic-reshaper python-bidi
+        pip install -r requirements.txt
 
     - name: Setup Java JDK
       uses: actions/setup-java@v4
@@ -33,11 +33,9 @@ jobs:
       with:
         channel: 'stable'
 
-    - name: Build APK with Admin Privileges
+    - name: Build APK using Flet CLI
       run: |
-        # إعطاء الصلاحيات الكاملة للمجلد وتفعيل أمر المسؤول
-        chmod -R 777 .
-        sudo env "PATH=$PATH" flet build apk --yes
+        flet build apk --yes
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
