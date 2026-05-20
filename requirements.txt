@@ -1,0 +1,7 @@
+flet
+easyocr
+pandas
+pdfplumber
+openpyxl
+arabic-reshaper
+python-bidi
