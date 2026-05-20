@@ -1,7 +1,6 @@
 flet
-easyocr
 pandas
-pdfplumber
 openpyxl
+pdfplumber
 arabic-reshaper
 python-bidi
