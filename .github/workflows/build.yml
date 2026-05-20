@@ -33,9 +33,11 @@ jobs:
       with:
         channel: 'stable'
 
-    - name: Build APK using Flet CLI
+    - name: Build APK with Admin Privileges
       run: |
-        flet build apk --yes
+        # إعطاء الصلاحيات الكاملة للمجلد وتفعيل أمر المسؤول
+        chmod -R 777 .
+        sudo env "PATH=$PATH" flet build apk --yes
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
