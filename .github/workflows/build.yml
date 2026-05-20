@@ -24,7 +24,7 @@ jobs:
 
     - name: Build APK using Flet CLI
       run: |
-        flet build apk --main main.py
+        flet build apk
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
